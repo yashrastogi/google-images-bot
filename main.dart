@@ -45,7 +45,7 @@ void main() {
         logFile.writeAsString(
             "Incoming inline query \"" +
                 inlineQuery.query +
-                "\" from ${inlineQuery.from.first_name}${inlineQuery.from.last_name == null ? "" : " " + inlineQuery.from.last_name}\n",
+                "\" from ${inlineQuery.from.first_name}${inlineQuery.from.last_name == null ? "" : " " + inlineQuery.from.last_name} (${inlineQuery.from.id})\n",
             mode: io.FileMode.append),
         getGoogleImages(inlineQuery.query, count: 12).then((urls) {
           var results = new List<InlineQueryResult>();
