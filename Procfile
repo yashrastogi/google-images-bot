@@ -1,1 +1,1 @@
-web: /app/main.exe
+web: ./dart-sdk/bin/dart2native main.dart ; ./main.exe
