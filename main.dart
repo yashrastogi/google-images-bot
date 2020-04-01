@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:teledart/teledart.dart';
 import 'package:teledart/telegram.dart';
 import 'package:teledart/model.dart';
@@ -24,7 +25,7 @@ Future<List<Uri>> getGoogleImages(String query, {int count = 5}) async {
 
 void main() {
   var teledart =
-      TeleDart(Telegram(String.fromEnvironment('TELEGRAM_API_TOKEN')), Event());
+      TeleDart(Telegram(Platform.environment['TELEGRAM_API_TOKEN']), Event());
 
   teledart.start().then((me) => print('${me.username} is initialised.'));
 
