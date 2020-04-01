@@ -4,7 +4,6 @@ import 'package:teledart/telegram.dart';
 import 'package:teledart/model.dart';
 import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dio/dio.dart';
-import 'dart:convert';
 
 Future<List<Uri>> getGoogleImages(String query, {int count = 5}) async {
   var url = Uri.parse(
@@ -59,7 +58,7 @@ void main() {
                 ..caption = count.toString()
                 ..thumb_url = url.toString()
                 ..photo_url = url.toString()
-                ..id = count.toString(),
+                ..id = inlineQuery.query + count.toString(),
             );
           }
           teledart.answerInlineQuery(inlineQuery, results);
