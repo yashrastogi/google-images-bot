@@ -1,1 +1,1 @@
-web: ./main.exe
+web: ./app/main.exe
