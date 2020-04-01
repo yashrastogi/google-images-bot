@@ -42,8 +42,10 @@ void main() {
           caption: 'This is how the Dart Bird and Telegram, met'));
 
   teledart.onInlineQuery().listen((inlineQuery) => {
+        print(
+            "Inline query \"${inlineQuery.query}\" from ${inlineQuery.from.first_name}${inlineQuery.from.last_name == null ? "" : " " + inlineQuery.from.last_name} (${inlineQuery.from.id})"),
         logFile.writeAsString(
-            "Incoming inline query \"" +
+            "Inline query \"" +
                 inlineQuery.query +
                 "\" from ${inlineQuery.from.first_name}${inlineQuery.from.last_name == null ? "" : " " + inlineQuery.from.last_name} (${inlineQuery.from.id})\n",
             mode: io.FileMode.append),
