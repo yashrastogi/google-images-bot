@@ -1,0 +1,5 @@
+name: telegram_bot
+dependencies:
+  teledart:
+  beautifulsoup:
+  dio:
