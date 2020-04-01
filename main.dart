@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:io' as io;
 import 'package:teledart/teledart.dart';
 import 'package:teledart/telegram.dart';
 import 'package:teledart/model.dart';
@@ -24,8 +24,9 @@ Future<List<Uri>> getGoogleImages(String query, {int count = 5}) async {
 }
 
 void main() {
-  var teledart =
-      TeleDart(Telegram(Platform.environment['TELEGRAM_API_TOKEN']), Event());
+  var logFile = new io.File('usage.log');
+  var teledart = TeleDart(
+      Telegram(io.Platform.environment['TELEGRAM_API_TOKEN']), Event());
 
   teledart.start().then((me) => print('${me.username} is initialised.'));
 
@@ -41,9 +42,11 @@ void main() {
           caption: 'This is how the Dart Bird and Telegram, met'));
 
   teledart.onInlineQuery().listen((inlineQuery) => {
-        print("Incoming inline query \"" +
-            inlineQuery.query +
-            "\" from ${inlineQuery.from.first_name}${inlineQuery.from.last_name == null ? "" : " " + inlineQuery.from.last_name}"),
+        logFile.writeAsString(
+            "Incoming inline query \"" +
+                inlineQuery.query +
+                "\" from ${inlineQuery.from.first_name}${inlineQuery.from.last_name == null ? "" : " " + inlineQuery.from.last_name}\n",
+            mode: io.FileMode.append),
         getGoogleImages(inlineQuery.query, count: 12).then((urls) {
           var results = new List<InlineQueryResult>();
           int count = 0;
@@ -60,4 +63,11 @@ void main() {
           teledart.answerInlineQuery(inlineQuery, results);
         }),
       });
+
+  logFile.stat().then((onValue) {
+    if (onValue.size > 5000000) {
+      logFile.delete();
+      logFile.create();
+    }
+  });
 }
