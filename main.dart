@@ -5,6 +5,30 @@ import 'package:teledart/model.dart';
 import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:dio/dio.dart';
 
+void printQuery(Object o, io.File logFile) {
+  var inlineQuery;
+  if (o.runtimeType == InlineQuery) {
+    inlineQuery = o as InlineQuery;
+    print(
+        "${o.runtimeType} \"${inlineQuery.query}\" from ${inlineQuery.from.first_name}${inlineQuery.from.last_name == null ? "" : " " + inlineQuery.from.last_name} (${inlineQuery.from.id})");
+    logFile.writeAsString(
+        "${o.runtimeType} \"" +
+            inlineQuery.query +
+            "\" from ${inlineQuery.from.first_name}${inlineQuery.from.last_name == null ? "" : " " + inlineQuery.from.last_name} (${inlineQuery.from.id})\n",
+        mode: io.FileMode.append);
+  }
+  if (o.runtimeType == Message) {
+    inlineQuery = o as Message;
+    print(
+        "${o.runtimeType} \"${inlineQuery.text}\" from ${inlineQuery.from.first_name}${inlineQuery.from.last_name == null ? "" : " " + inlineQuery.from.last_name} (${inlineQuery.from.id})");
+    logFile.writeAsString(
+        "${o.runtimeType} \"" +
+            inlineQuery.text +
+            "\" from ${inlineQuery.from.first_name}${inlineQuery.from.last_name == null ? "" : " " + inlineQuery.from.last_name} (${inlineQuery.from.id})\n",
+        mode: io.FileMode.append);
+  }
+}
+
 Future<List<Uri>> getGoogleImages(String query, {int count = 5}) async {
   var url = Uri.parse(
       "https://www.google.com/search?tbm=isch&q=${Uri.encodeFull(query)}");
@@ -33,6 +57,10 @@ void main() {
       message,
       'Hello, Sir ${message.from.first_name}${message.from.last_name == null ? "" : " " + message.from.last_name}!')));
 
+  teledart.onCommand('test').listen((message) {
+    printQuery(message, logFile);
+  });
+
   teledart
       .onMessage(keyword: 'dart')
       .where((message) => message.text.contains('telegram'))
@@ -41,13 +69,7 @@ void main() {
           caption: 'This is how the Dart Bird and Telegram, met'));
 
   teledart.onInlineQuery().listen((inlineQuery) => {
-        print(
-            "Inline query \"${inlineQuery.query}\" from ${inlineQuery.from.first_name}${inlineQuery.from.last_name == null ? "" : " " + inlineQuery.from.last_name} (${inlineQuery.from.id})"),
-        logFile.writeAsString(
-            "Inline query \"" +
-                inlineQuery.query +
-                "\" from ${inlineQuery.from.first_name}${inlineQuery.from.last_name == null ? "" : " " + inlineQuery.from.last_name} (${inlineQuery.from.id})\n",
-            mode: io.FileMode.append),
+        printQuery(inlineQuery, logFile),
         getGoogleImages(inlineQuery.query, count: 12).then((urls) {
           var results = new List<InlineQueryResult>();
           int count = 0;
@@ -65,10 +87,12 @@ void main() {
         }),
       });
 
-  logFile.stat().then((onValue) {
-    if (onValue.size > 5000000) {
-      logFile.delete();
-      logFile.create();
-    }
+  logFile.watch().listen((onData) {
+    logFile.stat().then((onValue) {
+      if (onValue.size > 5000000) {
+        logFile.delete();
+        logFile.create();
+      }
+    });
   });
 }
