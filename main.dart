@@ -68,24 +68,28 @@ void main() {
           'https://raw.githubusercontent.com/DinoLeung/TeleDart/master/example/dash_paper_plane.png',
           caption: 'This is how the Dart Bird and Telegram, met'));
 
-  teledart.onInlineQuery().listen((inlineQuery) => {
-        printQuery(inlineQuery, logFile),
-        getGoogleImages(inlineQuery.query, count: 12).then((urls) {
-          var results = new List<InlineQueryResult>();
-          int count = 0;
-          for (var url in urls) {
-            count++;
-            results.add(
-              InlineQueryResultPhoto()
-                ..caption = count.toString()
-                ..thumb_url = url.toString()
-                ..photo_url = url.toString()
-                ..id = inlineQuery.query + count.toString(),
-            );
-          }
-          teledart.answerInlineQuery(inlineQuery, results);
-        }),
-      });
+  try {
+    teledart.onInlineQuery().listen((inlineQuery) => {
+          printQuery(inlineQuery, logFile),
+          getGoogleImages(inlineQuery.query, count: 12).then((urls) {
+            var results = new List<InlineQueryResult>();
+            int count = 0;
+            for (var url in urls) {
+              count++;
+              results.add(
+                InlineQueryResultPhoto()
+                  ..caption = count.toString()
+                  ..thumb_url = url.toString()
+                  ..photo_url = url.toString()
+                  ..id = inlineQuery.query + count.toString(),
+              );
+            }
+            teledart.answerInlineQuery(inlineQuery, results);
+          }),
+        });
+  } catch (e) {
+    print("Delayed response to InlineQuery" + e);
+  }
 
   logFile.watch().listen((onData) {
     logFile.stat().then((onValue) {
